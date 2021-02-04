@@ -33,6 +33,7 @@ import com.compasso.uol.gabriel.entity.Authentication;
 import com.compasso.uol.gabriel.entity.City;
 import com.compasso.uol.gabriel.entity.Client;
 import com.compasso.uol.gabriel.enumerator.message.AuthenticationMessage;
+import com.compasso.uol.gabriel.enumerator.message.ClientMessage;
 import com.compasso.uol.gabriel.enumerator.message.CommomMessage;
 import com.compasso.uol.gabriel.response.Response;
 import com.compasso.uol.gabriel.service.AddressService;
@@ -41,6 +42,7 @@ import com.compasso.uol.gabriel.service.CityService;
 import com.compasso.uol.gabriel.service.ClientService;
 import com.compasso.uol.gabriel.utils.Messages;
 
+import io.swagger.annotations.ApiOperation;
 import lombok.NoArgsConstructor;
 
 @RestController
@@ -64,8 +66,9 @@ public class ClientController {
 	@Autowired
 	private AuthenticationService authenticationService;
 
-	@GetMapping
 	@Cacheable("client")
+	@GetMapping("/find-all")
+	@ApiOperation(value = "Retorna todos os clientes cadastrados.")
 	public ResponseEntity<Response<List<ReturnClientDTO>>> findAll() throws NoSuchAlgorithmException {
 		log.info("Buscando todas as cidades.");
 		Response<List<ReturnClientDTO>> response = new Response<List<ReturnClientDTO>>();
@@ -77,7 +80,8 @@ public class ClientController {
 	}
 
 	@Cacheable("client")
-	@RequestMapping(params = "cpf", method = RequestMethod.GET)
+	@ApiOperation(value = "Retorna um cliente por um CPF válido.")
+	@RequestMapping(value="/find-cpf", params = "cpf", method = RequestMethod.GET)
 	public ResponseEntity<Response<ReturnClientDTO>> findCpf(@RequestParam @CPF String cpf)
 			throws NoSuchAlgorithmException {
 		log.info("Buscando o cliente com o CPF: {}", cpf);
@@ -85,7 +89,7 @@ public class ClientController {
 
 		Optional<Client> clientOpt = clientService.findByCpf(cpf);
 		if (!clientOpt.isPresent()) {
-			log.error("O cliente com o CPF não foi encontrado: {}", cpf);
+			log.error("O cliente não foi encontrado com o CPF recebido: {}", cpf);
 			response.addError(Messages.getClient(CommomMessage.NONEXISTENT.toString()));
 
 			return ResponseEntity.badRequest().body(response);
@@ -97,11 +101,12 @@ public class ClientController {
 		return ResponseEntity.ok(response);
 	}
 
-	@PostMapping
-	public ResponseEntity<Response<IncludeClientDTO>> include(@Valid @RequestBody IncludeClientDTO includeClientDTO,
+	@PostMapping("/include")
+	@ApiOperation(value = "Inclui um cliente.")
+	public ResponseEntity<Response<Authentication>> include(@Valid @RequestBody IncludeClientDTO includeClientDTO,
 			BindingResult result) throws NoSuchAlgorithmException {
 		log.info("Incluindo o cliente: {}", includeClientDTO.toString());
-		Response<IncludeClientDTO> response = new Response<IncludeClientDTO>();
+		Response<Authentication> response = new Response<Authentication>();
 
 		if (result.hasErrors()) {
 			log.error("Erro validando dados para cadastro do cliente: {}", result.getAllErrors());
@@ -110,10 +115,19 @@ public class ClientController {
 			return ResponseEntity.badRequest().body(response);
 		}
 
+		String cpf = includeClientDTO.getCpf();
+		Optional<Client> clientOpt = this.clientService.findByCpf(cpf);
+		if (clientOpt.isPresent()) {
+			log.error("O CPF já pertence a outro cliente: {}", cpf);
+			response.addError(Messages.getClient(ClientMessage.ALREADYEXISTSCPF.toString()));
+
+			return ResponseEntity.badRequest().body(response);
+		}
+
 		String email = includeClientDTO.getAuthentication().getEmail();
 		Optional<Authentication> authOpt = this.authenticationService.findByEmail(email);
 		if (authOpt.isPresent()) {
-			log.error("O e-mail já está cadastrado: {}", email);
+			log.error("O e-mail já pertence a outra autenticação: {}", email);
 			response.addError(Messages.getAuthentication(AuthenticationMessage.ALREADYEXISTSEMAIL.toString()));
 
 			return ResponseEntity.badRequest().body(response);
@@ -122,7 +136,7 @@ public class ClientController {
 		Long idCity = includeClientDTO.getAddress().getIdCity();
 		Optional<City> cityOpt = this.cityService.findById(idCity);
 		if (!cityOpt.isPresent()) {
-			log.error("A cidade com o Id não foi encontrado: {}", idCity);
+			log.error("A cidade não foi encontrado com o Id recebido: {}", idCity);
 			response.addError(Messages.getCity(CommomMessage.NONEXISTENT.toString()));
 
 			return ResponseEntity.badRequest().body(response);
@@ -137,13 +151,17 @@ public class ClientController {
 		auth.setPassword(encodedPassword);
 
 		auth.setClient(client);
-		this.authenticationService.persist(auth);
+		auth = this.authenticationService.persist(auth);
 
-		response.setData(includeClientDTO);
+		auth.getClient().setAuthentication(null);
+		auth.getClient().getAddress().setClients(null);
+
+		response.setData(auth);
 		return ResponseEntity.ok(response);
 	}
 
-	@PutMapping
+	@PutMapping("/edit")
+	@ApiOperation(value = "Atualiza os dados cadastrais de um cliente.")
 	public ResponseEntity<Response<Client>> edit(@Valid @RequestBody EditClientDTO editClientDTO, BindingResult result)
 			throws NoSuchAlgorithmException {
 		log.info("Editando o cliente: {}", editClientDTO.toString());
@@ -156,20 +174,29 @@ public class ClientController {
 			return ResponseEntity.badRequest().body(response);
 		}
 
-		Long idAuth = editClientDTO.getAuthentication().getId();
-		Optional<Authentication> authOpt = this.authenticationService.findById(idAuth);
-		if (!authOpt.isPresent()) {
-			log.error("A auteticação com o Id não foi encontrada: {}", idAuth);
-			response.addError(Messages.getAuthentication(CommomMessage.NONEXISTENT.toString()));
+		Long idClient = editClientDTO.getId();
+		Optional<Client> clientOpt = this.clientService.findById(idClient);
+		if (!clientOpt.isPresent()) {
+			log.error("O cliente não foi encontrado com o Id recebido: {}", idClient);
+			response.addError(Messages.getClient(CommomMessage.NONEXISTENT.toString()));
 
 			return ResponseEntity.badRequest().body(response);
 		}
 
-		Long idClient = editClientDTO.getId();
-		Optional<Client> clientOpt = this.clientService.findById(idClient);
-		if (!clientOpt.isPresent()) {
-			log.error("O cliente com o Id não foi encontrado: {}", idClient);
-			response.addError(Messages.getClient(CommomMessage.NONEXISTENT.toString()));
+		String cpf = editClientDTO.getCpf();
+		clientOpt = this.clientService.findByCpf(cpf);
+		if (clientOpt.isPresent() && !clientOpt.get().getId().equals(idClient)) {
+			log.error("O CPF já pertence a outro cliente: {}", cpf);
+			response.addError(Messages.getClient(ClientMessage.ALREADYEXISTSCPF.toString()));
+
+			return ResponseEntity.badRequest().body(response);
+		}
+
+		Long idAuth = editClientDTO.getAuthentication().getId();
+		Optional<Authentication> authOpt = this.authenticationService.findById(idAuth);
+		if (!authOpt.isPresent()) {
+			log.error("A auteticação não foi encontrada com o Id recebido: {}", idAuth);
+			response.addError(Messages.getAuthentication(CommomMessage.NONEXISTENT.toString()));
 
 			return ResponseEntity.badRequest().body(response);
 		}
@@ -177,7 +204,7 @@ public class ClientController {
 		Long idAddress = editClientDTO.getAddress().getId();
 		Optional<Address> addressOpt = this.addressService.findById(idAddress);
 		if (!addressOpt.isPresent()) {
-			log.error("O endereço com o Id não foi encontrada: {}", idAddress);
+			log.error("O endereço não foi encontrada com o Id recebido: {}", idAddress);
 			response.addError(Messages.getAddress(CommomMessage.NONEXISTENT.toString()));
 
 			return ResponseEntity.badRequest().body(response);
@@ -186,7 +213,7 @@ public class ClientController {
 		Long idCity = editClientDTO.getAddress().getIdCity();
 		Optional<City> cityOpt = this.cityService.findById(idCity);
 		if (!cityOpt.isPresent()) {
-			log.error("A cidade com o Id não foi encontrado: {}", idCity);
+			log.error("A cidade não foi encontrada com o Id recebido: {}", idCity);
 			response.addError(Messages.getCity(CommomMessage.NONEXISTENT.toString()));
 
 			return ResponseEntity.badRequest().body(response);
@@ -208,7 +235,8 @@ public class ClientController {
 		return ResponseEntity.ok(response);
 	}
 
-	@DeleteMapping
+	@DeleteMapping("remove")
+	@ApiOperation(value = "Remove o cliente pelo Id.")
 	public ResponseEntity<Response<ReturnClientDTO>> remove(@RequestParam("id") Long id)
 			throws NoSuchAlgorithmException {
 		log.info("Removendo o cliente: {}", id);
@@ -216,7 +244,7 @@ public class ClientController {
 
 		Optional<Client> clientOpt = this.clientService.findById(id);
 		if (!clientOpt.isPresent()) {
-			log.info("O cliente não foi encontrado para o Id: {}", id);
+			log.info("O cliente não foi encontrado com o Id recebido: {}", id);
 			response.addError(Messages.getClient(CommomMessage.NONEXISTENT.toString()));
 
 			return ResponseEntity.badRequest().body(response);

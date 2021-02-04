@@ -40,7 +40,7 @@ public class City implements Serializable {
 	@NotNull(message = "Os dados da 'Estado' são obrigatórios.")
 	private State state;
 
-	@OneToMany(mappedBy = "address", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "city", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<Address> adresses;
 
 	@Override

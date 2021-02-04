@@ -35,6 +35,7 @@ import com.compasso.uol.gabriel.service.AuthenticationService;
 import com.compasso.uol.gabriel.service.ClientService;
 import com.compasso.uol.gabriel.utils.Messages;
 
+import io.swagger.annotations.ApiOperation;
 import lombok.NoArgsConstructor;
 
 @RestController
@@ -61,7 +62,8 @@ public class AuthenticationController {
 	private static final String BEARER_PREFIX = "Bearer ";
 	private static final String TOKEN_HEADER = "Authorization";
 
-	@PostMapping
+	@PostMapping("/login")
+	@ApiOperation(value = "Efetua o login no sistema, retornando dados do cliente e um token JWT.")
 	public ResponseEntity<Response<CreateTokenDTO>> login(@Valid @RequestBody LoginDTO loginDTO, BindingResult result)
 			throws NoSuchAlgorithmException {
 		log.info("Iniciando busca da autenticação: {}", loginDTO.toString());
@@ -110,7 +112,8 @@ public class AuthenticationController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping
+	@GetMapping("/refresh")
+	@ApiOperation(value = "Retorna um novo token apartir de um token válido.")
 	public ResponseEntity<Response<RefreshTokenDTO>> refresh(HttpServletRequest request) {
 		log.info("Regerando token.");
 		Response<RefreshTokenDTO> response = new Response<RefreshTokenDTO>();
