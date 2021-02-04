@@ -1,3 +1,4 @@
+package com.compasso.uol.gabriel;
 
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
