@@ -33,12 +33,16 @@ public class Address implements Serializable {
 	private Long id;
 
 	@Column(name = "cep", nullable = false)
-	@Size(min = 8, max = 8, message = "O campo 'CEP' deve conter 8 caracteres.")
-	private Integer cep;
+	@Size(min = 9, max = 9, message = "O campo 'CEP' deve conter 9 caracteres.")
+	private String cep;
 
 	@Column(name = "road", nullable = false)
 	@Size(min = 1, max = 255, message = "O campo 'Rua' deve conter entre 1 e 255 caracteres.")
 	private String road;
+	
+	@Column(name = "neighborhood", nullable = false)
+	@Size(min = 1, max = 255, message = "O campo 'Bairro' deve conter entre 1 e 255 caracteres.")
+	private String neighborhood;
 
 	@Column(name = "number", nullable = false)
 	@Size(min = 1, max = 8, message = "O campo 'Número' deve conter entre 1 e 8 caracteres.")

@@ -32,7 +32,7 @@ public class City implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	@Column(name = "name", nullable = false)
+	@Column(name = "name", unique = true, nullable = false)
 	@Size(min = 1, max = 70, message = "O campo 'Nome' deve conter entre 1 e 70 caracteres.")
 	private String name;
 

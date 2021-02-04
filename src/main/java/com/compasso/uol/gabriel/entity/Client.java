@@ -18,6 +18,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.br.CPF;
+
 import com.compasso.uol.gabriel.enumerator.GenderEnum;
 
 import lombok.Getter;
@@ -40,6 +42,11 @@ public class Client implements Serializable {
 	@Size(min = 1, max = 200, message = "O campo 'Nome' deve conter entre 1 e 200 caracteres.")
 	private String name;
 
+	@CPF
+	@Column(name = "cpf", unique = true, nullable = false)
+	@Size(min = 11, max = 11, message = "O campo 'CPF' deve conter 11 caracteres.")
+	private String cpf;
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "gender", nullable = false)
 	private GenderEnum gender;
@@ -51,13 +58,13 @@ public class Client implements Serializable {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@NotNull(message = "O dados da 'Cidade' são obrigatórios.")
 	private Address address;
-	
+
 	@OneToOne(mappedBy = "client", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Authentication authentication;
 
 	@Override
 	public String toString() {
-		return "Client [id=" + id + ", name=" + name + ", gender=" + gender + ", birth=" + birth + ", address=" + address
-				+ "]";
+		return "Client [id=" + id + ", name=" + name + ", gender=" + gender + ", birth=" + birth + ", address="
+				+ address + "]";
 	}
 }
