@@ -28,10 +28,12 @@ import com.compasso.uol.gabriel.dto.city.EditCityDTO;
 import com.compasso.uol.gabriel.dto.city.IncludeCityDTO;
 import com.compasso.uol.gabriel.dto.city.ReturnCityDTO;
 import com.compasso.uol.gabriel.entity.City;
+import com.compasso.uol.gabriel.entity.State;
 import com.compasso.uol.gabriel.enumerator.message.CityMessage;
 import com.compasso.uol.gabriel.enumerator.message.CommomMessage;
 import com.compasso.uol.gabriel.response.Response;
 import com.compasso.uol.gabriel.service.CityService;
+import com.compasso.uol.gabriel.service.StateService;
 import com.compasso.uol.gabriel.utils.Messages;
 
 import io.swagger.annotations.ApiOperation;
@@ -48,6 +50,9 @@ public class CityController {
 
 	@Autowired
 	private CityService cityService;
+
+	@Autowired
+	private StateService stateService;
 
 	@Cacheable("city")
 	@GetMapping("/find-all")
@@ -77,7 +82,7 @@ public class CityController {
 
 	@Cacheable("city")
 	@ApiOperation(value = "Retorna uma cidade pelo nome.")
-	@RequestMapping(value="find-name", params = "name", method = RequestMethod.GET)
+	@RequestMapping(value = "/find-name", params = "name", method = RequestMethod.GET)
 	public ResponseEntity<Response<ReturnCityDTO>> findName(@RequestParam String name) throws NoSuchAlgorithmException {
 		log.info("Buscando a cidade com o nome: {}", name);
 		Response<ReturnCityDTO> response = new Response<ReturnCityDTO>();
@@ -119,7 +124,18 @@ public class CityController {
 			return ResponseEntity.badRequest().body(response);
 		}
 
+		Long idState = cityDTO.getIdState();
+		Optional<State> stateOpt = this.stateService.findById(idState);
+		if (!stateOpt.isPresent()) {
+			log.error("O estado não foi encontrada com o Id recebido: {}", idState);
+			response.addError(Messages.getState(CommomMessage.NONEXISTENT.toString()));
+
+			return ResponseEntity.badRequest().body(response);
+		}
+
 		City city = mapper.map(cityDTO, City.class);
+		city.setState(stateOpt.get());
+
 		this.cityService.persist(city);
 
 		ReturnCityDTO returnCity = mapper.map(city, ReturnCityDTO.class);
@@ -151,7 +167,18 @@ public class CityController {
 			return ResponseEntity.badRequest().body(response);
 		}
 
+		Long idState = cityDTO.getIdState();
+		Optional<State> stateOpt = this.stateService.findById(idState);
+		if (!stateOpt.isPresent()) {
+			log.error("O estado não foi encontrada com o Id recebido: {}", idState);
+			response.addError(Messages.getState(CommomMessage.NONEXISTENT.toString()));
+
+			return ResponseEntity.badRequest().body(response);
+		}
+
 		City city = mapper.map(cityDTO, City.class);
+		city.setState(stateOpt.get());
+
 		this.cityService.persist(city);
 
 		ReturnCityDTO returnCity = mapper.map(city, ReturnCityDTO.class);

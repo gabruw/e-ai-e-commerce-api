@@ -77,7 +77,7 @@ public class StateController {
 
 	@Cacheable("state")
 	@ApiOperation(value = "Retorna um estado pelo nome.")
-	@RequestMapping(value="find-name", params = "name", method = RequestMethod.GET)
+	@RequestMapping(value="/find-name", params = "name", method = RequestMethod.GET)
 	public ResponseEntity<Response<ReturnStateDTO>> findName(@RequestParam String name)
 			throws NoSuchAlgorithmException {
 		log.info("Buscando o estado com o nome: {}", name);

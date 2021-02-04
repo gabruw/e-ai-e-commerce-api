@@ -44,7 +44,7 @@ public class Client implements Serializable {
 
 	@CPF
 	@Column(name = "cpf", unique = true, nullable = false)
-	@Size(min = 11, max = 11, message = "O campo 'CPF' deve conter 11 caracteres.")
+	@Size(min = 14, max = 14, message = "O campo 'CPF' deve conter 14 caracteres.")
 	private String cpf;
 
 	@Enumerated(EnumType.STRING)

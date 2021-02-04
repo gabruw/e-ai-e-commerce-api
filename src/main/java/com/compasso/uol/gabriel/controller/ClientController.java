@@ -81,7 +81,7 @@ public class ClientController {
 
 	@Cacheable("client")
 	@ApiOperation(value = "Retorna um cliente por um CPF válido.")
-	@RequestMapping(value="/find-cpf", params = "cpf", method = RequestMethod.GET)
+	@RequestMapping(value = "/find-cpf", params = "cpf", method = RequestMethod.GET)
 	public ResponseEntity<Response<ReturnClientDTO>> findCpf(@RequestParam @CPF String cpf)
 			throws NoSuchAlgorithmException {
 		log.info("Buscando o cliente com o CPF: {}", cpf);
@@ -155,6 +155,7 @@ public class ClientController {
 
 		auth.getClient().setAuthentication(null);
 		auth.getClient().getAddress().setClients(null);
+		auth.getClient().getAddress().getCity().setAdresses(null);
 
 		response.setData(auth);
 		return ResponseEntity.ok(response);
@@ -162,10 +163,10 @@ public class ClientController {
 
 	@PutMapping("/edit")
 	@ApiOperation(value = "Atualiza os dados cadastrais de um cliente.")
-	public ResponseEntity<Response<Client>> edit(@Valid @RequestBody EditClientDTO editClientDTO, BindingResult result)
-			throws NoSuchAlgorithmException {
+	public ResponseEntity<Response<Authentication>> edit(@Valid @RequestBody EditClientDTO editClientDTO,
+			BindingResult result) throws NoSuchAlgorithmException {
 		log.info("Editando o cliente: {}", editClientDTO.toString());
-		Response<Client> response = new Response<Client>();
+		Response<Authentication> response = new Response<Authentication>();
 
 		if (result.hasErrors()) {
 			log.error("Erro validando dados para edição do cliente: {}", result.getAllErrors());
@@ -228,10 +229,13 @@ public class ClientController {
 		client.setAddress(address);
 		auth.setClient(client);
 
-		this.authenticationService.persist(auth);
-		client.getAddress().setClients(null);
+		auth = this.authenticationService.persist(auth);
 
-		response.setData(client);
+		auth.getClient().setAuthentication(null);
+		auth.getClient().getAddress().setClients(null);
+		auth.getClient().getAddress().getCity().setAdresses(null);
+
+		response.setData(auth);
 		return ResponseEntity.ok(response);
 	}
 
