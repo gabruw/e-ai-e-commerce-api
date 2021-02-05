@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -81,8 +80,8 @@ public class CityController {
 	}
 
 	@Cacheable("city")
+	@GetMapping(value = "/find-name", params = "name")
 	@ApiOperation(value = "Retorna uma cidade pelo nome.")
-	@RequestMapping(value = "/find-name", params = "name", method = RequestMethod.GET)
 	public ResponseEntity<Response<ReturnCityDTO>> findName(@RequestParam String name) throws NoSuchAlgorithmException {
 		log.info("Buscando a cidade com o nome: {}", name);
 		Response<ReturnCityDTO> response = new Response<ReturnCityDTO>();
@@ -96,8 +95,9 @@ public class CityController {
 		}
 
 		ReturnCityDTO returnCity = mapper.map(cityOpt.get(), ReturnCityDTO.class);
+		returnCity.getState().setCities(null);
+		
 		response.setData(returnCity);
-
 		return ResponseEntity.ok(response);
 	}
 
@@ -139,8 +139,9 @@ public class CityController {
 		this.cityService.persist(city);
 
 		ReturnCityDTO returnCity = mapper.map(city, ReturnCityDTO.class);
+		returnCity.getState().setCities(null);
+		
 		response.setData(returnCity);
-
 		return ResponseEntity.ok(response);
 	}
 
@@ -160,7 +161,7 @@ public class CityController {
 
 		String name = cityDTO.getName();
 		Optional<City> cityOpt = this.cityService.findByName(name);
-		if (!cityOpt.isPresent()) {
+		if (cityOpt.isPresent() && !cityOpt.get().getId().equals(cityDTO.getId())) {
 			log.error("O nome já pertence a outra cidade: {}", name);
 			response.addError(Messages.getCity(CityMessage.ALREADYEXISTSNAME.toString()));
 
@@ -182,12 +183,13 @@ public class CityController {
 		this.cityService.persist(city);
 
 		ReturnCityDTO returnCity = mapper.map(city, ReturnCityDTO.class);
+		returnCity.getState().setCities(null);
+		
 		response.setData(returnCity);
-
 		return ResponseEntity.ok(response);
 	}
 
-	@DeleteMapping("/remove")
+	@DeleteMapping(value = "/remove", params = "id")
 	@ApiOperation(value = "Remove a cidade pelo Id.")
 	public ResponseEntity<Response<ReturnCityDTO>> remove(@RequestParam("id") Long id) throws NoSuchAlgorithmException {
 		log.info("Removendo a cidade: {}", id);

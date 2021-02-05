@@ -29,15 +29,21 @@ public class AddressServiceImpl implements AddressService {
 	public List<ReturnAddressDTO> findAll() {
 		log.info("Buscando todas os endereços.");
 
-		List<Address> adresses = this.addressRepository.findAll();
-		return adresses.stream().map(address -> mapper.map(address, ReturnAddressDTO.class))
+		List<Address> addresses = this.addressRepository.findAll();
+		return addresses.stream().map(address -> mapper.map(address, ReturnAddressDTO.class))
 				.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<Address> findByCep(String cep) {
 		log.info("Buscando um endereço pelo CEP: {}", cep);
-		return this.addressRepository.findByCep(cep);
+
+		List<Address> addresses = this.addressRepository.findByCep(cep);
+		return addresses.stream().map(address -> {
+			address.getCity().setAddresses(null);
+			
+			return address;
+		}).collect(Collectors.toList());
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package com.compasso.uol.gabriel.controller;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,10 +21,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.compasso.uol.gabriel.dto.address.EditAddressDTO;
+import com.compasso.uol.gabriel.dto.address.IncludeAddressDTO;
 import com.compasso.uol.gabriel.dto.client.EditClientDTO;
 import com.compasso.uol.gabriel.dto.client.IncludeClientDTO;
 import com.compasso.uol.gabriel.dto.client.ReturnClientDTO;
@@ -40,6 +41,7 @@ import com.compasso.uol.gabriel.service.AddressService;
 import com.compasso.uol.gabriel.service.AuthenticationService;
 import com.compasso.uol.gabriel.service.CityService;
 import com.compasso.uol.gabriel.service.ClientService;
+import com.compasso.uol.gabriel.utils.Crypt;
 import com.compasso.uol.gabriel.utils.Messages;
 
 import io.swagger.annotations.ApiOperation;
@@ -80,8 +82,8 @@ public class ClientController {
 	}
 
 	@Cacheable("client")
+	@GetMapping(value = "/find-cpf", params = "cpf")
 	@ApiOperation(value = "Retorna um cliente por um CPF válido.")
-	@RequestMapping(value = "/find-cpf", params = "cpf", method = RequestMethod.GET)
 	public ResponseEntity<Response<ReturnClientDTO>> findCpf(@RequestParam @CPF String cpf)
 			throws NoSuchAlgorithmException {
 		log.info("Buscando o cliente com o CPF: {}", cpf);
@@ -133,31 +135,45 @@ public class ClientController {
 			return ResponseEntity.badRequest().body(response);
 		}
 
-		Long idCity = includeClientDTO.getAddress().getIdCity();
-		Optional<City> cityOpt = this.cityService.findById(idCity);
-		if (!cityOpt.isPresent()) {
-			log.error("A cidade não foi encontrado com o Id recebido: {}", idCity);
-			response.addError(Messages.getCity(CommomMessage.NONEXISTENT.toString()));
+		List<Address> addresses = new ArrayList<Address>();
+		List<IncludeAddressDTO> addressesInclude = includeClientDTO.getAddresses();
+		addressesInclude.stream().forEach(value -> {
+			Optional<City> cityOpt = this.cityService.findById(value.getIdCity());
+			if (!cityOpt.isPresent()) {
+				log.error("Uma ou mais cidades informadas não foi encontrado com o Id recebido.");
+				response.addError(Messages.getCity(CommomMessage.NONEXISTENT.toString()));
+			}
 
+			Address address = mapper.map(value, Address.class);
+			address.setCity(mapper.map(cityOpt.get(), City.class));
+
+			addresses.add(address);
+		});
+
+		if (response.hasErrors()) {
 			return ResponseEntity.badRequest().body(response);
 		}
 
-		City city = mapper.map(cityOpt.get(), City.class);
 		Client client = mapper.map(includeClientDTO, Client.class);
-		client.getAddress().setCity(city);
+		client.setAddresses(null);
 
-		Authentication auth = mapper.map(includeClientDTO.getAuthentication(), Authentication.class);
-		String encodedPassword = new BCryptPasswordEncoder().encode(includeClientDTO.getAuthentication().getPassword());
-		auth.setPassword(encodedPassword);
+		String encodedPassword = Crypt.encode(includeClientDTO.getAuthentication().getPassword());
+		client.getAuthentication().setPassword(encodedPassword);
 
+		Authentication auth = mapper.map(client.getAuthentication(), Authentication.class);
+		client.setAuthentication(null);
 		auth.setClient(client);
-		auth = this.authenticationService.persist(auth);
 
-		auth.getClient().setAuthentication(null);
-		auth.getClient().getAddress().setClients(null);
-		auth.getClient().getAddress().getCity().setAdresses(null);
+		this.authenticationService.persist(auth);
 
+		addresses.stream().forEach(value -> {
+			value.setClient(auth.getClient());
+			this.addressService.persist(value);
+		});
+
+		auth.setPassword(includeClientDTO.getAuthentication().getPassword());
 		response.setData(auth);
+		
 		return ResponseEntity.ok(response);
 	}
 
@@ -202,44 +218,55 @@ public class ClientController {
 			return ResponseEntity.badRequest().body(response);
 		}
 
-		Long idAddress = editClientDTO.getAddress().getId();
-		Optional<Address> addressOpt = this.addressService.findById(idAddress);
-		if (!addressOpt.isPresent()) {
-			log.error("O endereço não foi encontrada com o Id recebido: {}", idAddress);
-			response.addError(Messages.getAddress(CommomMessage.NONEXISTENT.toString()));
+		List<Address> addresses = new ArrayList<Address>();
+		List<EditAddressDTO> addressesEdit = editClientDTO.getAddresses();
+		addressesEdit.stream().forEach(value -> {
+			Optional<Address> addressOpt = this.addressService.findById(value.getId());
+			if (!addressOpt.isPresent()) {
+				log.error("O endereço não foi encontrado com o Id recebido: {}", value.getId());
+				response.addError(Messages.getCity(CommomMessage.NONEXISTENT.toString()));
+			}
 
+			Optional<City> cityOpt = this.cityService.findById(value.getIdCity());
+			if (!cityOpt.isPresent()) {
+				log.error("A cidade não foi encontrada com o Id recebido: {}", value.getIdCity());
+				response.addError(Messages.getCity(CommomMessage.NONEXISTENT.toString()));
+			}
+
+			Address address = mapper.map(addressOpt.get(), Address.class);
+			address.setCity(mapper.map(cityOpt.get(), City.class));
+
+			addresses.add(address);
+		});
+
+		if (response.hasErrors()) {
 			return ResponseEntity.badRequest().body(response);
 		}
-
-		Long idCity = editClientDTO.getAddress().getIdCity();
-		Optional<City> cityOpt = this.cityService.findById(idCity);
-		if (!cityOpt.isPresent()) {
-			log.error("A cidade não foi encontrada com o Id recebido: {}", idCity);
-			response.addError(Messages.getCity(CommomMessage.NONEXISTENT.toString()));
-
-			return ResponseEntity.badRequest().body(response);
-		}
-
-		City city = mapper.map(cityOpt.get(), City.class);
-		Address address = mapper.map(addressOpt.get(), Address.class);
-		address.setCity(city);
 
 		Client client = mapper.map(editClientDTO, Client.class);
-		Authentication auth = mapper.map(authOpt.get(), Authentication.class);
-		client.setAddress(address);
+		client.setAddresses(null);
+
+		String encodedPassword = Crypt.encode(editClientDTO.getAuthentication().getPassword());
+		client.getAuthentication().setPassword(encodedPassword);
+
+		Authentication auth = mapper.map(client.getAuthentication(), Authentication.class);
+		client.setAuthentication(null);
 		auth.setClient(client);
 
-		auth = this.authenticationService.persist(auth);
+		this.authenticationService.persist(auth);
 
-		auth.getClient().setAuthentication(null);
-		auth.getClient().getAddress().setClients(null);
-		auth.getClient().getAddress().getCity().setAdresses(null);
+		addresses.stream().forEach(value -> {
+			value.setClient(auth.getClient());
+			this.addressService.persist(value);
+		});
 
+		auth.setPassword(editClientDTO.getAuthentication().getPassword());
 		response.setData(auth);
+		
 		return ResponseEntity.ok(response);
 	}
 
-	@DeleteMapping("remove")
+	@DeleteMapping(value = "/remove", params = "id")
 	@ApiOperation(value = "Remove o cliente pelo Id.")
 	public ResponseEntity<Response<ReturnClientDTO>> remove(@RequestParam("id") Long id)
 			throws NoSuchAlgorithmException {

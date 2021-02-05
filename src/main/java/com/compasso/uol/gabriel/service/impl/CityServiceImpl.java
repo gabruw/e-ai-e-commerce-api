@@ -31,7 +31,12 @@ public class CityServiceImpl implements CityService {
 		log.info("Buscando todas as cidades.");
 
 		List<City> cities = this.cityRepository.findAll();
-		return cities.stream().map(city -> mapper.map(city, ReturnCityDTO.class)).collect(Collectors.toList());
+		return cities.stream().map(city -> {
+			ReturnCityDTO returnCity = mapper.map(city, ReturnCityDTO.class);
+			returnCity.getState().setCities(null);
+
+			return returnCity;
+		}).collect(Collectors.toList());
 	}
 
 	@Override
@@ -51,7 +56,13 @@ public class CityServiceImpl implements CityService {
 		log.info("Buscando todas as opções de cidades ");
 
 		List<City> cities = this.cityRepository.findAll();
-		return cities.stream().map(city -> mapper.map(city, OptionDTO.class)).collect(Collectors.toList());
+		return cities.stream().map(city -> {
+			OptionDTO<Long> optionDTO = new OptionDTO<Long>();
+			optionDTO.setValue(city.getId());
+			optionDTO.setText(city.getName());
+
+			return optionDTO;
+		}).collect(Collectors.toList());
 	}
 
 	@Override

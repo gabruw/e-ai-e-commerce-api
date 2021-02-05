@@ -1,6 +1,7 @@
 package com.compasso.uol.gabriel.dto.client;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
@@ -14,11 +15,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class IncludeClientDTO extends ClientDTO implements Serializable {
+public class IncludeClientDTO extends ReturnClientDTO implements Serializable {
 	private static final long serialVersionUID = 972196048494520957L;
 
 	@NotNull(message = "O dados da 'Endereço' são obrigatórios.")
-	private IncludeAddressDTO address;
+	private List<IncludeAddressDTO> addresses;
 
 	@NotNull(message = "O dados da 'Autenticação' são obrigatórios.")
 	private IncludeAuthenticationDTO authentication;
@@ -26,6 +27,6 @@ public class IncludeClientDTO extends ClientDTO implements Serializable {
 	@Override
 	public String toString() {
 		return "IncludeClientDTO [name=" + this.getName() + ", cpf=" + this.getCpf() + ", gender=" + this.getGender()
-				+ ", birth=" + this.getBirth() + ", address=" + address + ", authentication=" + authentication + "]";
+				+ ", birth=" + this.getBirth() + ", addresses=" + addresses + ", authentication=" + authentication + "]";
 	}
 }

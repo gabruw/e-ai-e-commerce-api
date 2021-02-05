@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -76,8 +75,8 @@ public class StateController {
 	}
 
 	@Cacheable("state")
+	@GetMapping(value = "/find-name", params = "name")
 	@ApiOperation(value = "Retorna um estado pelo nome.")
-	@RequestMapping(value="/find-name", params = "name", method = RequestMethod.GET)
 	public ResponseEntity<Response<ReturnStateDTO>> findName(@RequestParam String name)
 			throws NoSuchAlgorithmException {
 		log.info("Buscando o estado com o nome: {}", name);
@@ -145,7 +144,7 @@ public class StateController {
 
 		String name = stateDTO.getName();
 		Optional<State> stateOpt = this.stateService.findByName(name);
-		if (!stateOpt.isPresent()) {
+		if (stateOpt.isPresent() && !stateOpt.get().getId().equals(stateDTO.getId())) {
 			log.error("O nome já pertence a outro estado: {}", name);
 			response.addError(Messages.getState(StateMessage.ALREADYEXISTSNAME.toString()));
 
@@ -161,7 +160,7 @@ public class StateController {
 		return ResponseEntity.ok(response);
 	}
 
-	@DeleteMapping("/remove")
+	@DeleteMapping(value = "/remove", params = "id")
 	@ApiOperation(value = "Remove o estado pelo Id.")
 	public ResponseEntity<Response<ReturnStateDTO>> remove(@RequestParam("id") Long id)
 			throws NoSuchAlgorithmException {
@@ -171,7 +170,7 @@ public class StateController {
 		Optional<State> stateOpt = this.stateService.findById(id);
 		if (!stateOpt.isPresent()) {
 			log.info("O estado não foi encontrado com o Id recebido: {}", id);
-			response.addError(Messages.getCity(CommomMessage.NONEXISTENT.toString()));
+			response.addError(Messages.getState(CommomMessage.NONEXISTENT.toString()));
 
 			return ResponseEntity.badRequest().body(response);
 		}

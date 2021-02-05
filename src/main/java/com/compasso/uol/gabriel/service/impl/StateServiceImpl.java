@@ -51,7 +51,13 @@ public class StateServiceImpl implements StateService {
 		log.info("Buscando todas as opções de estados.");
 
 		List<State> states = this.stateRepository.findAll();
-		return states.stream().map(state -> mapper.map(state, OptionDTO.class)).collect(Collectors.toList());
+		return states.stream().map(state -> {
+			OptionDTO<Long> optionDTO = new OptionDTO<Long>();
+			optionDTO.setValue(state.getId());
+			optionDTO.setText(state.getName());
+	
+			return optionDTO;
+		}).collect(Collectors.toList());
 	}
 
 	@Override

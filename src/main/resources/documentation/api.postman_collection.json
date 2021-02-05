@@ -1,0 +1,559 @@
+{
+	"info": {
+		"_postman_id": "12b4e937-1cc3-44bf-8c31-41fbdde991bd",
+		"name": "Abastece Aí",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authorization",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"genisvaldo@test.com\",\r\n    \"password\": \"teste@123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/authentication/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"authentication",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/authentication/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"authentication",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Client",
+			"item": [
+				{
+					"name": "Find All",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/client/find-all",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"client",
+								"find-all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find by CPF",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/client/find-cpf?cpf=882.174.830-86",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"client",
+								"find-cpf"
+							],
+							"query": [
+								{
+									"key": "cpf",
+									"value": "882.174.830-86"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Include",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Genisvaldo\",\r\n    \"gender\": \"MALE\",\r\n    \"birth\": \"1995-10-10\",\r\n    \"cpf\": \"882.174.830-86\",\r\n    \"addresses\": [\r\n        {\r\n            \"idCity\": 1,\r\n            \"cep\": \"36010-070\",\r\n            \"road\": \"Rua dos testes\",\r\n            \"neighborhood\": \"Bairro dos testes\",\r\n            \"number\": 201,\r\n            \"complement\": \"Ao lado da padaria\"\r\n        }\r\n    ],\r\n    \"authentication\": {\r\n        \"email\": \"genisvaldo@test.com\",\r\n        \"password\": \"teste@123\",\r\n        \"role\": \"ADMIN\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/client/include",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"client",
+								"include"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 1,\r\n    \"name\": \"Genisvaldo\",\r\n    \"gender\": \"MALE\",\r\n    \"birth\": \"1995-10-10\",\r\n    \"cpf\": \"882.174.830-86\",\r\n    \"addresses\": [\r\n        {\r\n            \"id\": 1,\r\n            \"idCity\": 2,\r\n            \"cep\": \"36010-070\",\r\n            \"road\": \"Rua dos testes\",\r\n            \"neighborhood\": \"Bairro dos testes\",\r\n            \"number\": 201,\r\n            \"complement\": \"Ao lado da padaria\"\r\n        }\r\n    ],\r\n    \"authentication\": {\r\n        \"id\": 1,\r\n        \"email\": \"genisvaldo@test.com\",\r\n        \"password\": \"teste@123\",\r\n        \"role\": \"ADMIN\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/client/edit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"client",
+								"edit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/client/remove/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"client",
+								"remove",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "State",
+			"item": [
+				{
+					"name": "Find All",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/state/find-all",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"state",
+								"find-all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Options",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/state/options",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"state",
+								"options"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find by Name",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/state/find-name?name=Minas Gerais",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"state",
+								"find-name"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Minas Gerais"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Include",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Minas Gerais\",\r\n    \"country\": \"Brasil\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/state/include",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"state",
+								"include"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 1,\r\n    \"name\": \"Cataguases\",\r\n    \"country\": \"Brasil\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/state/edit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"state",
+								"edit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/state/remove?id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"state",
+								"remove"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "City",
+			"item": [
+				{
+					"name": "Find All",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/city/find-all",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"city",
+								"find-all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Options",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/city/options",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"city",
+								"options"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find by Name",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/city/find-name?name=Juiz de Fora",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"city",
+								"find-name"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Juiz de Fora"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Include",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"idState\": 1,\r\n    \"name\": \"Juiz de Fora\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/city/include",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"city",
+								"include"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 1,\r\n    \"idState\": 1,\r\n    \"name\": \"Juiz de Fora\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/city/edit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"city",
+								"edit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/city/remove?id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"city",
+								"remove"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Address",
+			"item": [
+				{
+					"name": "Find All",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/address/find-all",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"address",
+								"find-all"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8743"
+		}
+	]
+}

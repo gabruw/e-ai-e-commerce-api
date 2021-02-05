@@ -13,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import lombok.Getter;
@@ -29,7 +28,7 @@ public class City implements Serializable {
 	private static final long serialVersionUID = 3259874520308167531L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(name = "name", unique = true, nullable = false)
@@ -37,14 +36,13 @@ public class City implements Serializable {
 	private String name;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@NotNull(message = "Os dados da 'Estado' são obrigatórios.")
 	private State state;
 
 	@OneToMany(mappedBy = "city", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	private List<Address> adresses;
+	private List<Address> addresses;
 
 	@Override
 	public String toString() {
-		return "City [id=" + id + ", name=" + name + ", state=" + state + ", adresses=" + adresses + "]";
+		return "City [id=" + id + ", name=" + name + "]";
 	}
 }

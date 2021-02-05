@@ -15,7 +15,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +32,7 @@ import com.compasso.uol.gabriel.response.Response;
 import com.compasso.uol.gabriel.security.config.JwtTokenUtil;
 import com.compasso.uol.gabriel.service.AuthenticationService;
 import com.compasso.uol.gabriel.service.ClientService;
+import com.compasso.uol.gabriel.utils.Crypt;
 import com.compasso.uol.gabriel.utils.Messages;
 
 import io.swagger.annotations.ApiOperation;
@@ -84,7 +84,7 @@ public class AuthenticationController {
 			return ResponseEntity.badRequest().body(response);
 		}
 
-		boolean isEqual = new BCryptPasswordEncoder().matches(loginDTO.getPassword(), authOpt.get().getPassword());
+		Boolean isEqual = Crypt.matches(loginDTO.getPassword(), authOpt.get().getPassword());
 		if (!isEqual) {
 			log.info("Autenticação com a senha incorreta: {}", loginDTO.getPassword());
 			response.addError(Messages.getAuthentication(AuthenticationMessage.INVALIDPASSWORD.toString()));

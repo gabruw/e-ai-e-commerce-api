@@ -9,27 +9,27 @@ import com.compasso.uol.gabriel.response.ResponseError;
 
 public class Messages {
 	public static ResponseError getAuthentication(String key) {
-		ResourceBundle bundle = ResourceBundle.getBundle("AuthenticationMessages", Locale.getDefault());
+		ResourceBundle bundle = ResourceBundle.getBundle("messages.AuthenticationMessages", Locale.getDefault());
 		return getMessages(bundle, key);
 	}
 
 	public static ResponseError getAddress(String key) {
-		ResourceBundle bundle = ResourceBundle.getBundle("AddressMessages", Locale.getDefault());
+		ResourceBundle bundle = ResourceBundle.getBundle("messages.AddressMessages", Locale.getDefault());
 		return getMessages(bundle, key);
 	}
 
 	public static ResponseError getClient(String key) {
-		ResourceBundle bundle = ResourceBundle.getBundle("ClientMessages", Locale.getDefault());
+		ResourceBundle bundle = ResourceBundle.getBundle("messages.ClientMessages", Locale.getDefault());
 		return getMessages(bundle, key);
 	}
 
 	public static ResponseError getCity(String key) {
-		ResourceBundle bundle = ResourceBundle.getBundle("CityMessages", Locale.getDefault());
+		ResourceBundle bundle = ResourceBundle.getBundle("messages.CityMessages", Locale.getDefault());
 		return getMessages(bundle, key);
 	}
 
 	public static ResponseError getState(String key) {
-		ResourceBundle bundle = ResourceBundle.getBundle("StateMessages", Locale.getDefault());
+		ResourceBundle bundle = ResourceBundle.getBundle("messages.StateMessages", Locale.getDefault());
 		return getMessages(bundle, key);
 	}
 

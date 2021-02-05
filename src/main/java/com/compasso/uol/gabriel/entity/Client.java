@@ -2,6 +2,7 @@ package com.compasso.uol.gabriel.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -12,7 +13,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -35,7 +36,7 @@ public class Client implements Serializable {
 	private static final long serialVersionUID = 3259874520308178951L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(name = "name", nullable = false)
@@ -55,16 +56,14 @@ public class Client implements Serializable {
 	@NotNull(message = "O campo 'Data de Nascimento' é obrigatório.")
 	private Date birth;
 
-	@ManyToOne(fetch = FetchType.EAGER)
-	@NotNull(message = "O dados da 'Cidade' são obrigatórios.")
-	private Address address;
+	@OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
+	private List<Address> addresses;
 
-	@OneToOne(mappedBy = "client", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToOne(mappedBy = "client", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Authentication authentication;
 
 	@Override
 	public String toString() {
-		return "Client [id=" + id + ", name=" + name + ", gender=" + gender + ", birth=" + birth + ", address="
-				+ address + "]";
+		return "Client [id=" + id + ", name=" + name + ", gender=" + gender + ", birth=" + birth + "]";
 	}
 }

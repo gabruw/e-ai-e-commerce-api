@@ -27,7 +27,7 @@ public class State implements Serializable {
 	private static final long serialVersionUID = 3259874520308167531L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(name = "name", unique = true, nullable = false)
@@ -43,6 +43,6 @@ public class State implements Serializable {
 
 	@Override
 	public String toString() {
-		return "State [id=" + id + ", name=" + name + ", country=" + country + ", cities=" + cities + "]";
+		return "State [id=" + id + ", name=" + name + ", country=" + country + "]";
 	}
 }

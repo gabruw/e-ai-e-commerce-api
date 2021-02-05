@@ -2,6 +2,7 @@ package com.compasso.uol.gabriel.dto.address;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import lombok.Getter;
@@ -14,7 +15,7 @@ import lombok.Setter;
 public class IncludeAddressDTO implements Serializable {
 	private static final long serialVersionUID = 9035185421614865764L;
 
-	@Size(min = 1, max = 11, message = "O campo 'Id da Cidade' deve conter entre 1 e 11 caracteres.")
+	@NotNull(message = "O campo 'Id da Cidade' é obrigatório.")
 	private Long idCity;
 
 	@Size(min = 9, max = 9, message = "O campo 'CEP' deve conter 9 caracteres.")
@@ -26,7 +27,7 @@ public class IncludeAddressDTO implements Serializable {
 	@Size(min = 1, max = 255, message = "O campo 'Bairro' deve conter entre 1 e 255 caracteres.")
 	private String neighborhood;
 
-	@Size(min = 1, max = 8, message = "O campo 'Número' deve conter entre 1 e 8 caracteres.")
+	@NotNull(message = "O campo 'Número' é obrigatório.")
 	private Integer number;
 
 	@Size(min = 1, max = 255, message = "O campo 'Complemento' deve conter entre 1 e 255 caracteres.")
