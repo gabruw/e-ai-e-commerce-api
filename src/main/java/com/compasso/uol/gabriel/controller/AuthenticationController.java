@@ -84,7 +84,7 @@ public class AuthenticationController {
 			return ResponseEntity.badRequest().body(response);
 		}
 
-		Boolean isEqual = Crypt.matches(loginDTO.getPassword(), authOpt.get().getPassword());
+		Boolean isEqual = Crypt.matches(authOpt.get().getPassword(), loginDTO.getPassword());
 		if (!isEqual) {
 			log.info("Autenticação com a senha incorreta: {}", loginDTO.getPassword());
 			response.addError(Messages.getAuthentication(AuthenticationMessage.INVALIDPASSWORD.toString()));

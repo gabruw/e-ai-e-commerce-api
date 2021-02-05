@@ -526,6 +526,24 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Find Cep",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/address/find-cep",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"address",
+								"find-cep"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
