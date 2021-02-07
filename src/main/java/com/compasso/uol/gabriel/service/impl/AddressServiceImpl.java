@@ -1,13 +1,13 @@
 package com.compasso.uol.gabriel.service.impl;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.compasso.uol.gabriel.dto.address.ReturnAddressDTO;
@@ -26,24 +26,23 @@ public class AddressServiceImpl implements AddressService {
 	private AddressRepository addressRepository;
 
 	@Override
-	public List<ReturnAddressDTO> findAll() {
+	public Page<ReturnAddressDTO> findAll(PageRequest pageRequest) {
 		log.info("Buscando todas os endereços.");
 
-		List<Address> addresses = this.addressRepository.findAll();
-		return addresses.stream().map(address -> mapper.map(address, ReturnAddressDTO.class))
-				.collect(Collectors.toList());
+		Page<Address> addresses = this.addressRepository.findAll(pageRequest);
+		return addresses.map(address -> mapper.map(address, ReturnAddressDTO.class));
 	}
 
 	@Override
-	public List<Address> findByCep(String cep) {
+	public Page<Address> findByCep(String cep, PageRequest pageRequest) {
 		log.info("Buscando um endereço pelo CEP: {}", cep);
 
-		List<Address> addresses = this.addressRepository.findByCep(cep);
-		return addresses.stream().map(address -> {
+		Page<Address> addresses = this.addressRepository.findByCep(cep, pageRequest);
+		return addresses.map(address -> {
 			address.getCity().setAddresses(null);
-			
+
 			return address;
-		}).collect(Collectors.toList());
+		});
 	}
 
 	@Override

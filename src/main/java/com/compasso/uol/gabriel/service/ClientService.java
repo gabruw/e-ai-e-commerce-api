@@ -1,13 +1,15 @@
 package com.compasso.uol.gabriel.service;
 
-import java.util.List;
 import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import com.compasso.uol.gabriel.dto.client.ReturnClientDTO;
 import com.compasso.uol.gabriel.entity.Client;
 
 public interface ClientService {
-	List<ReturnClientDTO> findAll();
+	Page<ReturnClientDTO> findAll(PageRequest pageRequest);
 
 	Optional<Client> findById(Long id);
 

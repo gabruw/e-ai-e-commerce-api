@@ -15,6 +15,10 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.compasso.uol.gabriel.dto.OptionDTO;
@@ -44,6 +48,11 @@ public class CityServiceTest {
 	private static final String CITY = "Juiz de Fora";
 	private static final String STATE = "Minas Gerais";
 
+	private static final Integer PAGE = 0;
+	private static final String ORDER = "id";
+	private static final Integer PAGE_SIZE = 8;
+	private static final String DIRECTION = "DESC";
+
 	@BeforeEach
 	public void setup() {
 		state = new State();
@@ -62,9 +71,12 @@ public class CityServiceTest {
 		List<City> cities = new ArrayList<City>();
 		cities.add(city);
 
-		when(this.cityRepository.findAll()).thenReturn(cities);
+		Page<City> pageCities = new PageImpl<City>(cities);
+		PageRequest pageRequest = PageRequest.of(PAGE, PAGE_SIZE, Direction.valueOf(DIRECTION), ORDER);
 
-		List<ReturnCityDTO> tCities = this.cityService.findAll();
+		when(this.cityRepository.findAll(pageRequest)).thenReturn(pageCities);
+
+		Page<ReturnCityDTO> tCities = this.cityService.findAll(pageRequest);
 		Assertions.assertFalse(tCities.isEmpty());
 	}
 

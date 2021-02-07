@@ -15,6 +15,10 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.compasso.uol.gabriel.dto.address.ReturnAddressDTO;
@@ -54,6 +58,11 @@ public class AddressServiceTest {
 	private static final String ROAD = "Rua Santa Rita";
 	private static final String COMPLEMENT = "Ao lado da loja de moveis";
 
+	private static final Integer PAGE = 0;
+	private static final String ORDER = "id";
+	private static final Integer PAGE_SIZE = 8;
+	private static final String DIRECTION = "DESC";
+
 	@BeforeEach
 	public void setup() {
 		state = new State();
@@ -82,9 +91,12 @@ public class AddressServiceTest {
 		List<Address> addresses = new ArrayList<Address>();
 		addresses.add(address);
 
-		when(this.addressRepository.findAll()).thenReturn(addresses);
+		Page<Address> pageAddresses = new PageImpl<Address>(addresses);
+		PageRequest pageRequest = PageRequest.of(PAGE, PAGE_SIZE, Direction.valueOf(DIRECTION), ORDER);
 
-		List<ReturnAddressDTO> tAddresses = this.addressService.findAll();
+		when(this.addressRepository.findAll(pageRequest)).thenReturn(pageAddresses);
+
+		Page<ReturnAddressDTO> tAddresses = this.addressService.findAll(pageRequest);
 		Assertions.assertFalse(tAddresses.isEmpty());
 	}
 
@@ -104,10 +116,13 @@ public class AddressServiceTest {
 		List<Address> addresses = new ArrayList<Address>();
 		addresses.add(address);
 
-		when(this.addressRepository.findByCep(CEP)).thenReturn(addresses);
+		Page<Address> pageAddresses = new PageImpl<Address>(addresses);
+		PageRequest pageRequest = PageRequest.of(PAGE, PAGE_SIZE, Direction.valueOf(DIRECTION), ORDER);
 
-		List<Address> tAddresses = this.addressService.findByCep(CEP);
-		Assertions.assertEquals(tAddresses, addresses);
+		when(this.addressRepository.findByCep(CEP, pageRequest)).thenReturn(pageAddresses);
+
+		Page<Address> tAddresses = this.addressService.findByCep(CEP, pageRequest);
+		Assertions.assertEquals(tAddresses, pageAddresses);
 	}
 
 	@Test

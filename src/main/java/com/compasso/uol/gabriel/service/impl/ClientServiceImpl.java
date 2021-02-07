@@ -1,13 +1,13 @@
 package com.compasso.uol.gabriel.service.impl;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.compasso.uol.gabriel.dto.client.ReturnClientDTO;
@@ -26,11 +26,11 @@ public class ClientServiceImpl implements ClientService {
 	private ClientRepository clientRepository;
 
 	@Override
-	public List<ReturnClientDTO> findAll() {
+	public Page<ReturnClientDTO> findAll(PageRequest pageRequest) {
 		log.info("Buscando todos os clientes.");
 
-		List<Client> clients = this.clientRepository.findAll();
-		return clients.stream().map(client -> mapper.map(client, ReturnClientDTO.class)).collect(Collectors.toList());
+		Page<Client> clients = this.clientRepository.findAll(pageRequest);
+		return clients.map(client -> mapper.map(client, ReturnClientDTO.class));
 	}
 
 	@Override

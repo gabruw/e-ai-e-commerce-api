@@ -10,7 +10,11 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -53,16 +57,24 @@ public class CityController {
 	@Autowired
 	private StateService stateService;
 
+	@Value("${page.size}")
+	private int PAGE_SIZE;
+
 	@Cacheable("city")
 	@GetMapping("/find-all")
 	@ApiOperation(value = "Retorna todas as cidades cadastradas.")
-	public ResponseEntity<Response<List<ReturnCityDTO>>> findAll() throws NoSuchAlgorithmException {
+	public ResponseEntity<Response<Page<ReturnCityDTO>>> findAll(
+			@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "order", defaultValue = "id") String order,
+			@RequestParam(value = "direction", defaultValue = "DESC") String direction)
+			throws NoSuchAlgorithmException {
 		log.info("Buscando todas as cidades.");
-		Response<List<ReturnCityDTO>> response = new Response<List<ReturnCityDTO>>();
+		Response<Page<ReturnCityDTO>> response = new Response<Page<ReturnCityDTO>>();
 
-		List<ReturnCityDTO> cities = this.cityService.findAll();
+		PageRequest pageRequest = PageRequest.of(page, this.PAGE_SIZE, Direction.valueOf(direction), order);
+		Page<ReturnCityDTO> cities = this.cityService.findAll(pageRequest);
+		
 		response.setData(cities);
-
 		return ResponseEntity.ok(response);
 	}
 
@@ -96,7 +108,7 @@ public class CityController {
 
 		ReturnCityDTO returnCity = mapper.map(cityOpt.get(), ReturnCityDTO.class);
 		returnCity.getState().setCities(null);
-		
+
 		response.setData(returnCity);
 		return ResponseEntity.ok(response);
 	}
@@ -140,7 +152,7 @@ public class CityController {
 
 		ReturnCityDTO returnCity = mapper.map(city, ReturnCityDTO.class);
 		returnCity.getState().setCities(null);
-		
+
 		response.setData(returnCity);
 		return ResponseEntity.ok(response);
 	}
@@ -184,7 +196,7 @@ public class CityController {
 
 		ReturnCityDTO returnCity = mapper.map(city, ReturnCityDTO.class);
 		returnCity.getState().setCities(null);
-		
+
 		response.setData(returnCity);
 		return ResponseEntity.ok(response);
 	}

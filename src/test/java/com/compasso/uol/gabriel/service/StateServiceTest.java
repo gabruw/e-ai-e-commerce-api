@@ -15,6 +15,10 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.compasso.uol.gabriel.dto.OptionDTO;
@@ -39,6 +43,11 @@ public class StateServiceTest {
 	private static final String COUNTRY = "Brasil";
 	private static final String NAME = "Minas Gerais";
 
+	private static final Integer PAGE = 0;
+	private static final String ORDER = "id";
+	private static final Integer PAGE_SIZE = 8;
+	private static final String DIRECTION = "DESC";
+
 	@BeforeEach
 	public void setup() {
 		state = new State();
@@ -51,9 +60,12 @@ public class StateServiceTest {
 		List<State> states = new ArrayList<State>();
 		states.add(state);
 
-		when(this.stateRepository.findAll()).thenReturn(states);
+		Page<State> pageStates = new PageImpl<State>(states);
+		PageRequest pageRequest = PageRequest.of(PAGE, PAGE_SIZE, Direction.valueOf(DIRECTION), ORDER);
 
-		List<ReturnStateDTO> tStates = this.stateService.findAll();
+		when(this.stateRepository.findAll(pageRequest)).thenReturn(pageStates);
+
+		Page<ReturnStateDTO> tStates = this.stateService.findAll(pageRequest);
 		Assertions.assertFalse(tStates.isEmpty());
 	}
 

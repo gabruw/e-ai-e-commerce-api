@@ -1,12 +1,15 @@
 package com.compasso.uol.gabriel.controller;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,29 +33,42 @@ public class AddressController {
 	@Autowired
 	private AddressService addressService;
 
+	@Value("${page.size}")
+	private int PAGE_SIZE;
+
 	@Cacheable("address")
 	@GetMapping("/find-all")
 	@ApiOperation(value = "Retorna todos os endereços cadastrados.")
-	public ResponseEntity<Response<List<ReturnAddressDTO>>> findAll() throws NoSuchAlgorithmException {
+	public ResponseEntity<Response<Page<ReturnAddressDTO>>> findAll(
+			@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "order", defaultValue = "id") String order,
+			@RequestParam(value = "direction", defaultValue = "DESC") String direction)
+			throws NoSuchAlgorithmException {
 		log.info("Buscando todas os endereços.");
-		Response<List<ReturnAddressDTO>> response = new Response<List<ReturnAddressDTO>>();
+		Response<Page<ReturnAddressDTO>> response = new Response<Page<ReturnAddressDTO>>();
 
-		List<ReturnAddressDTO> addresses = this.addressService.findAll();
+		PageRequest pageRequest = PageRequest.of(page, this.PAGE_SIZE, Direction.valueOf(direction), order);
+		Page<ReturnAddressDTO> addresses = this.addressService.findAll(pageRequest);
+
 		response.setData(addresses);
-
 		return ResponseEntity.ok(response);
 	}
 
 	@Cacheable("address")
 	@GetMapping(value = "/find-cep", params = "cep")
 	@ApiOperation(value = "Retorna todos os endereços cadastrados com o CEP informado.")
-	public ResponseEntity<Response<List<Address>>> findCep(@RequestParam String cep) throws NoSuchAlgorithmException {
+	public ResponseEntity<Response<Page<Address>>> findCep(@RequestParam(value = "cep", required = true) String cep,
+			@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "order", defaultValue = "id") String order,
+			@RequestParam(value = "direction", defaultValue = "DESC") String direction)
+			throws NoSuchAlgorithmException {
 		log.info("Buscando todos os endereços com o CEP: {}", cep);
-		Response<List<Address>> response = new Response<List<Address>>();
+		Response<Page<Address>> response = new Response<Page<Address>>();
 
-		List<Address> addresses = this.addressService.findByCep(cep);
+		PageRequest pageRequest = PageRequest.of(page, this.PAGE_SIZE, Direction.valueOf(direction), order);
+		Page<Address> addresses = this.addressService.findByCep(cep, pageRequest);
+
 		response.setData(addresses);
-
 		return ResponseEntity.ok(response);
 	}
 }

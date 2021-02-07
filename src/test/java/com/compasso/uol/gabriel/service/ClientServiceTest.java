@@ -16,6 +16,10 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.compasso.uol.gabriel.dto.client.ReturnClientDTO;
@@ -74,6 +78,11 @@ public class ClientServiceTest {
 	private static final String CPF = "123.266.176-73";
 	private static final GenderEnum GENDER = GenderEnum.MALE;
 
+	private static final Integer PAGE = 0;
+	private static final String ORDER = "id";
+	private static final Integer PAGE_SIZE = 8;
+	private static final String DIRECTION = "DESC";
+
 	@BeforeEach
 	public void setup() {
 		auth = new Authentication();
@@ -119,9 +128,12 @@ public class ClientServiceTest {
 		List<Client> clients = new ArrayList<Client>();
 		clients.add(client);
 
-		when(this.clientRepository.findAll()).thenReturn(clients);
+		Page<Client> pageClients = new PageImpl<Client>(clients);
+		PageRequest pageRequest = PageRequest.of(PAGE, PAGE_SIZE, Direction.valueOf(DIRECTION), ORDER);
 
-		List<ReturnClientDTO> tClients = this.clientService.findAll();
+		when(this.clientRepository.findAll(pageRequest)).thenReturn(pageClients);
+
+		Page<ReturnClientDTO> tClients = this.clientService.findAll(pageRequest);
 		Assertions.assertFalse(tClients.isEmpty());
 	}
 

@@ -8,6 +8,8 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.compasso.uol.gabriel.dto.OptionDTO;
@@ -27,11 +29,11 @@ public class StateServiceImpl implements StateService {
 	private StateRepository stateRepository;
 
 	@Override
-	public List<ReturnStateDTO> findAll() {
+	public Page<ReturnStateDTO> findAll(PageRequest pageRequest) {
 		log.info("Buscando todas os estados.");
 
-		List<State> states = this.stateRepository.findAll();
-		return states.stream().map(state -> mapper.map(state, ReturnStateDTO.class)).collect(Collectors.toList());
+		Page<State> states = this.stateRepository.findAll(pageRequest);
+		return states.map(state -> mapper.map(state, ReturnStateDTO.class));
 	}
 
 	@Override
@@ -55,7 +57,7 @@ public class StateServiceImpl implements StateService {
 			OptionDTO<Long> optionDTO = new OptionDTO<Long>();
 			optionDTO.setValue(state.getId());
 			optionDTO.setText(state.getName());
-	
+
 			return optionDTO;
 		}).collect(Collectors.toList());
 	}

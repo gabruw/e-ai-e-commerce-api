@@ -12,7 +12,11 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -68,14 +72,22 @@ public class ClientController {
 	@Autowired
 	private AuthenticationService authenticationService;
 
+	@Value("${page.size}")
+	private int PAGE_SIZE;
+
 	@Cacheable("client")
 	@GetMapping("/find-all")
 	@ApiOperation(value = "Retorna todos os clientes cadastrados.")
-	public ResponseEntity<Response<List<ReturnClientDTO>>> findAll() throws NoSuchAlgorithmException {
+	public ResponseEntity<Response<Page<ReturnClientDTO>>> findAll(
+			@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "order", defaultValue = "id") String order,
+			@RequestParam(value = "direction", defaultValue = "DESC") String direction)
+			throws NoSuchAlgorithmException {
 		log.info("Buscando todas as cidades.");
-		Response<List<ReturnClientDTO>> response = new Response<List<ReturnClientDTO>>();
+		Response<Page<ReturnClientDTO>> response = new Response<Page<ReturnClientDTO>>();
 
-		List<ReturnClientDTO> clients = clientService.findAll();
+		PageRequest pageRequest = PageRequest.of(page, this.PAGE_SIZE, Direction.valueOf(direction), order);
+		Page<ReturnClientDTO> clients = clientService.findAll(pageRequest);
 		response.setData(clients);
 
 		return ResponseEntity.ok(response);
@@ -173,7 +185,7 @@ public class ClientController {
 
 		auth.setPassword(includeClientDTO.getAuthentication().getPassword());
 		response.setData(auth);
-		
+
 		return ResponseEntity.ok(response);
 	}
 
@@ -262,7 +274,7 @@ public class ClientController {
 
 		auth.setPassword(editClientDTO.getAuthentication().getPassword());
 		response.setData(auth);
-		
+
 		return ResponseEntity.ok(response);
 	}
 

@@ -10,7 +10,11 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,16 +52,24 @@ public class StateController {
 	@Autowired
 	private StateService stateService;
 
+	@Value("${page.size}")
+	private int PAGE_SIZE;
+
 	@Cacheable("state")
 	@GetMapping("/find-all")
 	@ApiOperation(value = "Retorna todos os estados cadastrados.")
-	public ResponseEntity<Response<List<ReturnStateDTO>>> findAll() throws NoSuchAlgorithmException {
+	public ResponseEntity<Response<Page<ReturnStateDTO>>> findAll(
+			@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "order", defaultValue = "id") String order,
+			@RequestParam(value = "direction", defaultValue = "DESC") String direction)
+			throws NoSuchAlgorithmException {
 		log.info("Buscando todas os estados.");
-		Response<List<ReturnStateDTO>> response = new Response<List<ReturnStateDTO>>();
+		Response<Page<ReturnStateDTO>> response = new Response<Page<ReturnStateDTO>>();
 
-		List<ReturnStateDTO> states = this.stateService.findAll();
+		PageRequest pageRequest = PageRequest.of(page, this.PAGE_SIZE, Direction.valueOf(direction), order);
+		Page<ReturnStateDTO> states = this.stateService.findAll(pageRequest);
+		
 		response.setData(states);
-
 		return ResponseEntity.ok(response);
 	}
 

@@ -8,6 +8,8 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.compasso.uol.gabriel.dto.OptionDTO;
@@ -27,16 +29,16 @@ public class CityServiceImpl implements CityService {
 	private CityRepository cityRepository;
 
 	@Override
-	public List<ReturnCityDTO> findAll() {
+	public Page<ReturnCityDTO> findAll(PageRequest pageRequest) {
 		log.info("Buscando todas as cidades.");
 
-		List<City> cities = this.cityRepository.findAll();
-		return cities.stream().map(city -> {
+		Page<City> cities = this.cityRepository.findAll(pageRequest);
+		return cities.map(city -> {
 			ReturnCityDTO returnCity = mapper.map(city, ReturnCityDTO.class);
 			returnCity.getState().setCities(null);
 
 			return returnCity;
-		}).collect(Collectors.toList());
+		});
 	}
 
 	@Override
