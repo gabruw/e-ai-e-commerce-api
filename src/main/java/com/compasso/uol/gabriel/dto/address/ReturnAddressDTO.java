@@ -29,7 +29,7 @@ public class ReturnAddressDTO implements Serializable {
 	@Size(min = 1, max = 8, message = "O campo 'Número' deve conter entre 1 e 8 caracteres.")
 	private Integer number;
 
-	@Size(min = 1, max = 255, message = "O campo 'Complemento' deve conter entre 1 e 255 caracteres.")
+	@Size(max = 255, message = "O campo 'Complemento' deve conter no máximo 255 caracteres.")
 	private String complement;
 
 	@NotNull(message = "Os dados da 'Cidade' são obrigatórios.")

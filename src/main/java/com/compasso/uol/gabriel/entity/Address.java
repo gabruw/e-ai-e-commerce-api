@@ -46,8 +46,8 @@ public class Address implements Serializable {
 	@NotNull(message = "O campo 'Número' é obrigatório.")
 	private Integer number;
 
-	@Column(name = "complement", nullable = false)
-	@Size(min = 1, max = 255, message = "O campo 'Complemento' deve conter entre 1 e 255 caracteres.")
+	@Column(name = "complement", nullable = true)
+	@Size(max = 255, message = "O campo 'Complemento' deve conter entre 1 e 255 caracteres.")
 	private String complement;
 
 	@ManyToOne(fetch = FetchType.EAGER)

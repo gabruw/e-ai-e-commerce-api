@@ -26,10 +26,14 @@ import com.compasso.uol.gabriel.dto.city.ReturnCityDTO;
 import com.compasso.uol.gabriel.entity.City;
 import com.compasso.uol.gabriel.entity.State;
 import com.compasso.uol.gabriel.repository.CityRepository;
+import com.compasso.uol.gabriel.repository.StateRepository;
 
 @SpringBootTest
 @ActiveProfiles("test")
 public class CityServiceTest {
+
+	@MockBean
+	private StateRepository stateRepository;
 
 	@MockBean
 	private CityRepository cityRepository;
@@ -104,9 +108,10 @@ public class CityServiceTest {
 		List<City> cities = new ArrayList<City>();
 		cities.add(city);
 
-		when(this.cityRepository.findAll()).thenReturn(cities);
+		state.setCities(cities);
+		when(this.stateRepository.findById(ID)).thenReturn(Optional.of(state));
 
-		List<OptionDTO<Long>> options = this.cityService.findOptions();
+		List<OptionDTO<Long>> options = this.cityService.findOptions(ID);
 		OptionDTO<Long> option = options.stream().findFirst().get();
 		Assertions.assertTrue(option.getValue() == ID && option.getText().equals(CITY));
 	}

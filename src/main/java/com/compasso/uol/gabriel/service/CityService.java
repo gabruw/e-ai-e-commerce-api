@@ -17,7 +17,7 @@ public interface CityService {
 
 	Optional<City> findByName(String name);
 
-	List<OptionDTO<Long>> findOptions();
+	List<OptionDTO<Long>> findOptions(Long idState);
 
 	City persist(City city);
 

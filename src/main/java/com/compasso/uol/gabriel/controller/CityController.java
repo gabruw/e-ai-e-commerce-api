@@ -79,13 +79,13 @@ public class CityController {
 	}
 
 	@Cacheable("city")
-	@GetMapping("/options")
+	@GetMapping(value = "/options", params = "idState")
 	@ApiOperation(value = "Retorna todas as cidades no formato de opções.")
-	public ResponseEntity<Response<List<OptionDTO<Long>>>> findOptions() throws NoSuchAlgorithmException {
+	public ResponseEntity<Response<List<OptionDTO<Long>>>> findOptions(@RequestParam Long idState) throws NoSuchAlgorithmException {
 		log.info("Buscando as opções das cidades.");
 		Response<List<OptionDTO<Long>>> response = new Response<List<OptionDTO<Long>>>();
-
-		List<OptionDTO<Long>> cities = this.cityService.findOptions();
+		
+		List<OptionDTO<Long>> cities = this.cityService.findOptions(idState);
 		response.setData(cities);
 
 		return ResponseEntity.ok(response);

@@ -1,8 +1,8 @@
 package com.compasso.uol.gabriel.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service;
 import com.compasso.uol.gabriel.dto.OptionDTO;
 import com.compasso.uol.gabriel.dto.city.ReturnCityDTO;
 import com.compasso.uol.gabriel.entity.City;
+import com.compasso.uol.gabriel.entity.State;
 import com.compasso.uol.gabriel.repository.CityRepository;
+import com.compasso.uol.gabriel.repository.StateRepository;
 import com.compasso.uol.gabriel.service.CityService;
 
 @Service
@@ -24,6 +26,9 @@ public class CityServiceImpl implements CityService {
 
 	@Autowired
 	private ModelMapper mapper;
+
+	@Autowired
+	private StateRepository stateRepository;
 
 	@Autowired
 	private CityRepository cityRepository;
@@ -54,17 +59,24 @@ public class CityServiceImpl implements CityService {
 	}
 
 	@Override
-	public List<OptionDTO<Long>> findOptions() {
+	public List<OptionDTO<Long>> findOptions(Long idState) {
 		log.info("Buscando todas as opções de cidades ");
 
-		List<City> cities = this.cityRepository.findAll();
-		return cities.stream().map(city -> {
+		List<OptionDTO<Long>> options = new ArrayList<OptionDTO<Long>>();
+		Optional<State> optState = this.stateRepository.findById(idState);
+		if (!optState.isPresent()) {
+			return options;
+		}
+
+		optState.get().getCities().stream().forEach(city -> {
 			OptionDTO<Long> optionDTO = new OptionDTO<Long>();
 			optionDTO.setValue(city.getId());
 			optionDTO.setText(city.getName());
 
-			return optionDTO;
-		}).collect(Collectors.toList());
+			options.add(optionDTO);
+		});
+		
+		return options;
 	}
 
 	@Override
