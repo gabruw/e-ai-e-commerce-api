@@ -19,12 +19,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ReturnClientDTO implements Serializable {
-	private static final long serialVersionUID = -4487488554624891683L;
+public class ClientDTO implements Serializable {
+	private static final long serialVersionUID = -5387244674624891683L;
 
-	@NotNull(message = "O campo 'Id' é obrigatório.")
-	private Long id;
-	
 	@Size(min = 1, max = 200, message = "O campo 'Nome' deve conter entre 1 e 200 caracteres.")
 	private String name;
 
@@ -37,9 +34,4 @@ public class ReturnClientDTO implements Serializable {
 
 	@NotNull(message = "O campo 'Data de Nascimento' é obrigatório.")
 	private Date birth;
-
-	@Override
-	public String toString() {
-		return "ReturnClientDTO [name=" + name + ", cpf=" + cpf + ", gender=" + gender + ", birth=" + birth + "]";
-	}
 }

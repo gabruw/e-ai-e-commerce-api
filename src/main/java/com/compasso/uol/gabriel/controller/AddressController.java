@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -65,8 +66,8 @@ public class AddressController {
 		log.info("Buscando todos os endereços com o CEP: {}", cep);
 		Response<Page<Address>> response = new Response<Page<Address>>();
 
-		PageRequest pageRequest = PageRequest.of(page, this.PAGE_SIZE, Direction.valueOf(direction), order);
-		Page<Address> addresses = this.addressService.findByCep(cep, pageRequest);
+		Pageable pageable = PageRequest.of(page, this.PAGE_SIZE, Direction.valueOf(direction), order);
+		Page<Address> addresses = this.addressService.findByCep(cep, pageable);
 
 		response.setData(addresses);
 		return ResponseEntity.ok(response);

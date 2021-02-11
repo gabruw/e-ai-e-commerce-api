@@ -533,13 +533,19 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/address/find-cep",
+							"raw": "{{base_url}}/address/find-cep?cep=36010-070",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"address",
 								"find-cep"
+							],
+							"query": [
+								{
+									"key": "cep",
+									"value": "36010-070"
+								}
 							]
 						}
 					},

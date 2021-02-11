@@ -154,12 +154,13 @@ public class ClientController {
 			if (!cityOpt.isPresent()) {
 				log.error("Uma ou mais cidades informadas não foi encontrado com o Id recebido.");
 				response.addError(Messages.getCity(CommomMessage.NONEXISTENT.toString()));
+
+			} else {
+				Address address = mapper.map(value, Address.class);
+				address.setCity(mapper.map(cityOpt.get(), City.class));
+
+				addresses.add(address);
 			}
-
-			Address address = mapper.map(value, Address.class);
-			address.setCity(mapper.map(cityOpt.get(), City.class));
-
-			addresses.add(address);
 		});
 
 		if (response.hasErrors()) {
@@ -237,18 +238,18 @@ public class ClientController {
 			if (!addressOpt.isPresent()) {
 				log.error("O endereço não foi encontrado com o Id recebido: {}", value.getId());
 				response.addError(Messages.getCity(CommomMessage.NONEXISTENT.toString()));
+			} else {
+				Optional<City> cityOpt = this.cityService.findById(value.getIdCity());
+				if (!cityOpt.isPresent()) {
+					log.error("A cidade não foi encontrada com o Id recebido: {}", value.getIdCity());
+					response.addError(Messages.getCity(CommomMessage.NONEXISTENT.toString()));
+				} else {
+					Address address = mapper.map(addressOpt.get(), Address.class);
+					address.setCity(mapper.map(cityOpt.get(), City.class));
+
+					addresses.add(address);
+				}
 			}
-
-			Optional<City> cityOpt = this.cityService.findById(value.getIdCity());
-			if (!cityOpt.isPresent()) {
-				log.error("A cidade não foi encontrada com o Id recebido: {}", value.getIdCity());
-				response.addError(Messages.getCity(CommomMessage.NONEXISTENT.toString()));
-			}
-
-			Address address = mapper.map(addressOpt.get(), Address.class);
-			address.setCity(mapper.map(cityOpt.get(), City.class));
-
-			addresses.add(address);
 		});
 
 		if (response.hasErrors()) {

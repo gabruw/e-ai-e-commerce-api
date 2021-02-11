@@ -15,7 +15,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class EditClientDTO extends ReturnClientDTO implements Serializable {
+public class EditClientDTO extends ClientDTO implements Serializable {
 	private static final long serialVersionUID = 972196048494520957L;
 
 	@NotNull(message = "O campo 'Id' é obrigatório.")

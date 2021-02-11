@@ -17,6 +17,9 @@ import lombok.Setter;
 public class ReturnAddressDTO implements Serializable {
 	private static final long serialVersionUID = 1136111035449353768L;
 
+	@NotNull(message = "O campo 'Id' é obrigatório.")
+	private Long id;
+	
 	@Size(min = 9, max = 9, message = "O campo 'CEP' deve conter 9 caracteres.")
 	private String cep;
 

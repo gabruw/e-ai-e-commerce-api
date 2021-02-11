@@ -15,7 +15,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class IncludeClientDTO extends ReturnClientDTO implements Serializable {
+public class IncludeClientDTO extends ClientDTO implements Serializable {
 	private static final long serialVersionUID = 972196048494520957L;
 
 	@NotNull(message = "O dados da 'Endereço' são obrigatórios.")
